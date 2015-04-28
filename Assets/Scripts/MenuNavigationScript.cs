@@ -29,11 +29,35 @@ public class MenuNavigationScript : MonoBehaviour
 				} while ( animation.isPlaying );
 		}
 
+		void showAdditionalInfo (string info)
+		{
+				SearchResultInfo.transform.Find ("CompanyDetail").gameObject.SetActive (true);
+				SearchResultInfo.transform.Find ("CompanyDetail").GetComponent<Animator> ().SetTrigger ("FadeIn");
+				SearchResultInfo.transform.FindChild ("CompanyDetail").Find ("CompanyDetailText").GetComponent<Text> ().text = info;
+		}
+
+		public void hideAdditionalInfo ()
+		{
+				SearchResultInfo.transform.Find ("CompanyDetail").gameObject.SetActive (false);
+		}
+
 		public void showResultInfo (FirmInfo info)
 		{
 				SearchResultInfo.transform.FindChild ("CompanyName").GetComponent<Text> ().text = info.Name;
 				SearchResultInfo.transform.FindChild ("CompanyInfo").GetComponent<Text> ().text = info.Info;
-				SearchResultInfo.transform.Find ("CompanyLogo").GetComponent<UIImage> ().sprite = Resources.Load <Sprite>(info.Logo);
+				SearchResultInfo.transform.Find ("CompanyLogo").GetComponent<UIImage> ().sprite = Resources.Load <Sprite> (info.Logo);
+				UnityEngine.Events.UnityAction actionInfo = () => {
+						this.showAdditionalInfo (info.Info); };
+				UnityEngine.Events.UnityAction actionPartners = () => {
+						this.showAdditionalInfo (info.Partners); };
+				UnityEngine.Events.UnityAction actionResidents = () => {
+						this.showAdditionalInfo (info.Residents); };
+				UnityEngine.Events.UnityAction actionContacts = () => {
+						this.showAdditionalInfo (info.Contacts); };
+				SearchResultInfo.transform.Find ("buAbout").GetComponent<Button> ().onClick.AddListener (actionInfo);
+				SearchResultInfo.transform.Find ("buPartners").GetComponent<Button> ().onClick.AddListener (actionPartners);
+				SearchResultInfo.transform.Find ("buResidents").GetComponent<Button> ().onClick.AddListener (actionResidents);
+				SearchResultInfo.transform.Find ("buContacts").GetComponent<Button> ().onClick.AddListener (actionContacts);
 				this.switchWindow (SearchResultInfo);
 		}
 
@@ -112,8 +136,8 @@ public class MenuNavigationScript : MonoBehaviour
 				q.transform.SetParent (SearchResultPanel.transform, false);
 				q.transform.Find ("CompanyName").GetComponent<Text> ().text = info.Name;
 				q.transform.Find ("CompanyInfo").GetComponent<Text> ().text = info.Info;
-				q.transform.Find ("CompanyLogo").GetComponent<UIImage> ().sprite = Resources.Load <Sprite>(info.Logo);
-		//q.transform.Find ("CompanyLogo").GetComponent<Text> ().text = info.Logo;
+				q.transform.Find ("CompanyLogo").GetComponent<UIImage> ().sprite = Resources.Load <Sprite> (info.Logo);
+				//q.transform.Find ("CompanyLogo").GetComponent<Text> ().text = info.Logo;
 				UnityEngine.Events.UnityAction action1 = () => {
 						this.showResultInfo (info); };
 				q.GetComponent<Button> ().onClick.AddListener (action1);
@@ -165,7 +189,7 @@ public class MenuNavigationScript : MonoBehaviour
 				GameObject messageBox;
 				//Object prefab = new Object ();
 				//prefab = AssetDatabase.LoadAssetAtPath ("Assets/Prefabs/MessageBox.prefab", typeof(GameObject));
-				messageBox = Instantiate (Resources.Load("MessageBox")) as GameObject;
+				messageBox = Instantiate (Resources.Load ("MessageBox")) as GameObject;
 				messageBox.transform.SetParent (currentWindow.transform, false);
 				messageBox.GetComponent<Animator> ().SetTrigger ("FadeIn");
 				UnityEngine.Events.UnityAction action1 = () => {
