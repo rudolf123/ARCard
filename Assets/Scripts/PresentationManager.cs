@@ -1,22 +1,30 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class PresentationManager : MonoBehaviour
 {
 		public GameObject ImageTarget;
-		GameObject[] models;
-		GameObject currentModel = null;
+		List<GameObject> slides;
+		GameObject currentSlide = null;
 		int iterator;
+		List<string> runnigpresentations;
+		bool isRunning = false;
 		// Use this for initialization
 		void Start ()
 		{
-				models = GameObject.FindGameObjectsWithTag ("presentationModels");
-				currentModel = null;
+				//slides = new List<GameObject> (GameObject.FindGameObjectsWithTag ("Slides"));
+				slides = new List<GameObject> ();
+				slides.Add (GameObject.Find ("CMITSlide1"));
+				slides.Add (GameObject.Find ("CMITSlide2"));
+				slides.Add (GameObject.Find ("CMITSlide3"));
+				slides.Add (GameObject.Find ("CMITSlide4"));
+				runnigpresentations = new List<string> ();
+				currentSlide = null;
 				iterator = 0;
-				Debug.Log ("ModelsLen");
-				Debug.Log (models.Length);
-				for (int i=0; i < models.Length; i++)
-						models [i].SetActive (false);
+				Debug.Log ("SlidesLen: " + slides.Count.ToString ());
+				foreach (GameObject go in slides)
+						go.SetActive (false);
 		}
 	
 		// Update is called once per frame
@@ -38,80 +46,95 @@ public class PresentationManager : MonoBehaviour
 
 		public void runPresentation (string name)
 		{
-		Debug.Log ("Starting presentation: " + name);
-		GameObject runCanvas = ImageTarget.transform.Find("RunCanvas").gameObject;
-		runTriggerAnimation (runCanvas.transform.Find("buRunPresentation").gameObject, "Disappear");
-		runCanvas.SetActive (false);
-		GameObject bulb = ImageTarget.transform.Find("Slide_1").transform.Find("Bulb").gameObject;
-		GameObject SlideText1 = ImageTarget.transform.Find("Slide_1").transform.Find("TextSlide1").gameObject;
-		SlideText1.SetActive (true);
-		bulb.SetActive (true);
-		bulb.GetComponent<iTweenAnimation> ().StartPunchScale (new Vector3 (1,1,1));
-		bulb.GetComponent<iTweenAnimation> ().StartRotate ();
-		SlideText1.GetComponent<iTweenAnimation> ().StartPunchScale (new Vector3 (0.01f,0.01f,0.01f));
-		SlideText1.GetComponent<iTweenAnimation> ().StartMoveAdd ();
-		//runCanvas.SetActive (false);
+				Debug.Log ("Starting presentation: " + name);
+				GameObject runCanvas = ImageTarget.transform.Find ("RunCanvas").gameObject;
+				runCanvas.SetActive (false);
+				//runCanvas.GetComponent<iTweenAnimation> ().StartAnimation (AnimationType.rotate);
+				showSlide (iterator);
+				isRunning = true;
+				/*runTriggerAnimation (runCanvas.transform.Find ("buRunPresentation").gameObject, "Disappear");
+				runCanvas.SetActive (false);
+				GameObject bulb = ImageTarget.transform.Find ("Slide_1").transform.Find ("Bulb").gameObject;
+				GameObject SlideText1 = ImageTarget.transform.Find ("Slide_1").transform.Find ("TextSlide1").gameObject;
+				SlideText1.SetActive (true);
+				bulb.SetActive (true);
+				bulb.GetComponent<iTweenAnimation> ().StartPunchScale (new Vector3 (1, 1, 1));
+				bulb.GetComponent<iTweenAnimation> ().StartRotate ();
+				SlideText1.GetComponent<iTweenAnimation> ().StartPunchScale (new Vector3 (1, 1, 1));
+				SlideText1.GetComponent<iTweenAnimation> ().StartMoveAdd ();*/
+				//runCanvas.SetActive (false);
 		}
 
 		public void OnMarkerFound (string markerName)
 		{
-		Debug.Log ("Marker: " + markerName + " was found");
+				Debug.Log ("Marker: " + markerName + " was found");
 				if (markerName == "viz2") {
-						GameObject runCanvas = ImageTarget.transform.Find("RunCanvas").gameObject;
-						//Object prefab = new Object ();
-						//prefab = AssetDatabase.LoadAssetAtPath ("Assets/Prefabs/MessageBox.prefab", typeof(GameObject));
-						//runCanvas = Instantiate (Resources.Load ("RunCanvas")) as GameObject;
-						//runCanvas.transform.SetParent (ImageTarget.transform);
-						runCanvas.SetActive (true);
-						runTriggerAnimation (runCanvas.transform.Find("buRunPresentation").gameObject, "Appear");
+						if (!isRunning) {
+								GameObject runCanvas = ImageTarget.transform.Find ("RunCanvas").gameObject;
+								//Object prefab = new Object ();
+								//prefab = AssetDatabase.LoadAssetAtPath ("Assets/Prefabs/MessageBox.prefab", typeof(GameObject));
+								//runCanvas = Instantiate (Resources.Load ("RunCanvas")) as GameObject;
+								//runCanvas.transform.SetParent (ImageTarget.transform);
+								runCanvas.SetActive (true);
+								runTriggerAnimation (runCanvas.transform.Find ("buRunPresentation").gameObject, "Appear");
+
+								return;
+						}
+
+						if (currentSlide)
+								currentSlide.SetActive (true);
+
 				}
 		}
 
 		public void OnMarkerLost (string markerName)
 		{
-		Debug.Log ("Marker: " + markerName + " was lost");
-		if (markerName == "viz2") {
-			GameObject runCanvas = ImageTarget.transform.Find("RunCanvas").gameObject;
-			//Object prefab = new Object ();
-			//prefab = AssetDatabase.LoadAssetAtPath ("Assets/Prefabs/MessageBox.prefab", typeof(GameObject));
-			//runCanvas = Instantiate (Resources.Load ("RunCanvas")) as GameObject;
-			//runCanvas.transform.SetParent (ImageTarget.transform);
-			runCanvas.SetActive (false);
-			runTriggerAnimation (runCanvas.transform.Find("buRunPresentation").gameObject, "Disappear");
-		}
+				Debug.Log ("Marker: " + markerName + " was lost");
+				if (markerName == "viz2") {
+						if (currentSlide)
+								currentSlide.SetActive (false);
+
+						GameObject runCanvas = ImageTarget.transform.Find ("RunCanvas").gameObject;
+						//Object prefab = new Object ();
+						//prefab = AssetDatabase.LoadAssetAtPath ("Assets/Prefabs/MessageBox.prefab", typeof(GameObject));
+						//runCanvas = Instantiate (Resources.Load ("RunCanvas")) as GameObject;
+						//runCanvas.transform.SetParent (ImageTarget.transform);
+						runCanvas.SetActive (false);
+						runTriggerAnimation (runCanvas.transform.Find ("buRunPresentation").gameObject, "Disappear");
+				}
 		}
 
-		public void slideForward ()
+		public void nextSlide ()
 		{
-				if (iterator < models.Length - 1) {
+				if (iterator < slides.Count - 1) {
 						iterator++;
-						showModelWithId (iterator);
+						showSlide (iterator);
 				}
 				Debug.Log ("iterator = " + iterator);
 		}
 
-		public void slideBackward ()
+		public void prevSlide ()
 		{
 				if (iterator > 0) {
 						iterator--;
-						showModelWithId (iterator);
+						showSlide (iterator);
 				}
 				Debug.Log ("iterator = " + iterator);
 		}
 
-		void showModelWithId (int id)
+		void showSlide (int id)
 		{
-				if (currentModel)
-						currentModel.SetActive (false);
-				currentModel = models [id];
-				currentModel.SetActive (true);
-				Debug.Log ("id = " + id);
+				if (currentSlide)
+						currentSlide.SetActive (false);
+				currentSlide = slides [id];
+				currentSlide.SetActive (true);
+				Debug.Log ("current slide id = " + id.ToString ());
 		}
 
-		IEnumerator DoMoving()
+		IEnumerator DoMoving ()
 		{
-			//iTween.RotateBy(gameObject, iTween.Hash("z", 1, "easeType", "easeInOutBack", "loopType", "pingPong", "delay", .3));
-			yield return new WaitForSeconds(2f);
-			// ... other sequential actions here?
+				//iTween.RotateBy(gameObject, iTween.Hash("z", 1, "easeType", "easeInOutBack", "loopType", "pingPong", "delay", .3));
+				yield return new WaitForSeconds (2f);
+				// ... other sequential actions here?
 		}
 }
