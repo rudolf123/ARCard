@@ -12,7 +12,10 @@ public enum AnimationType
 
 		movefrom = 5,
 
-		none = 6
+		
+		none = 6,
+	linerotateY = 7,
+
 }
 
 public class iTweenAnimation : MonoBehaviour
@@ -67,6 +70,9 @@ public class iTweenAnimation : MonoBehaviour
 				case AnimationType.linerotate:
 						StartRotateLine ();
 						break;
+				case AnimationType.linerotateY:
+						StartRotateLineY ();
+						break;
 				case AnimationType.movefrom:
 						StartMoveFrom ();
 						break;
@@ -109,6 +115,11 @@ public class iTweenAnimation : MonoBehaviour
 
 		void StartMoveFrom ()
 		{
-		iTween.MoveFrom (gameObject, iTween.Hash ("position", new Vector3 (0, 300, 0), "easetype", "easeInOutBack", "speed", 10f));
+				iTween.MoveAdd (gameObject, iTween.Hash ("z", 80, "easeType", iTween.EaseType.linear, "loopType", "pingPong", "time", 5f, "delay", .001));
+		}
+
+		void StartRotateLineY ()
+		{
+				iTween.RotateBy (gameObject, iTween.Hash ("z", 1f, "easeType", "easeOutCirc", "speed", 1f));
 		}
 }
