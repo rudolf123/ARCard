@@ -4,8 +4,10 @@ using System.Collections.Generic;
 
 public class PresentationManager : MonoBehaviour
 {
-		public GameObject ImageTarget;
-		List<GameObject> slides;
+		public GameObject CMITImageTarget;
+		public GameObject MILAImageTarget;
+	List<GameObject> CMITslides;
+	List<GameObject> MILAslides;
 		GameObject currentSlide = null;
 		int iterator;
 		List<string> runnigpresentations;
@@ -14,17 +16,23 @@ public class PresentationManager : MonoBehaviour
 		void Start ()
 		{
 				//slides = new List<GameObject> (GameObject.FindGameObjectsWithTag ("Slides"));
-				slides = new List<GameObject> ();
-				slides.Add (GameObject.Find ("CMITSlide1"));
-				slides.Add (GameObject.Find ("CMITSlide2"));
-				slides.Add (GameObject.Find ("CMITSlide3"));
-				slides.Add (GameObject.Find ("CMITSlide4"));
+		CMITslides = new List<GameObject> ();
+		CMITslides.Add (GameObject.Find ("CMITSlide1"));
+		CMITslides.Add (GameObject.Find ("CMITSlide2"));
+		CMITslides.Add (GameObject.Find ("CMITSlide3"));
+		CMITslides.Add (GameObject.Find ("CMITSlide4"));
+		MILAslides.Add (GameObject.Find ("MilaSlide1"));
+		MILAslides.Add (GameObject.Find ("MilaSlide2"));
+		MILAslides.Add (GameObject.Find ("MilaSlide3"));
 				runnigpresentations = new List<string> ();
 				currentSlide = null;
 				iterator = 0;
-				Debug.Log ("SlidesLen: " + slides.Count.ToString ());
-				foreach (GameObject go in slides)
+		Debug.Log ("SlidesLen: " + CMITslides.Count.ToString ());
+		foreach (GameObject go in CMITslides)
 						go.SetActive (false);
+
+		foreach (GameObject go in MILAslides)
+			go.SetActive (false);
 		}
 	
 		// Update is called once per frame
@@ -47,7 +55,7 @@ public class PresentationManager : MonoBehaviour
 		public void runPresentation (string name)
 		{
 				Debug.Log ("Starting presentation: " + name);
-				GameObject runCanvas = ImageTarget.transform.Find ("RunCanvas").gameObject;
+				GameObject runCanvas = CMITImageTarget.transform.Find ("RunCanvas").gameObject;
 				runCanvas.SetActive (false);
 				//runCanvas.GetComponent<iTweenAnimation> ().StartAnimation (AnimationType.rotate);
 				showSlide (iterator);
@@ -70,7 +78,7 @@ public class PresentationManager : MonoBehaviour
 				Debug.Log ("Marker: " + markerName + " was found");
 				if (markerName == "viz2") {
 						if (!isRunning) {
-								GameObject runCanvas = ImageTarget.transform.Find ("RunCanvas").gameObject;
+				GameObject runCanvas = CMITImageTarget.transform.Find ("RunCanvas").gameObject;
 								//Object prefab = new Object ();
 								//prefab = AssetDatabase.LoadAssetAtPath ("Assets/Prefabs/MessageBox.prefab", typeof(GameObject));
 								//runCanvas = Instantiate (Resources.Load ("RunCanvas")) as GameObject;
@@ -94,7 +102,7 @@ public class PresentationManager : MonoBehaviour
 						if (currentSlide)
 								currentSlide.SetActive (false);
 
-						GameObject runCanvas = ImageTarget.transform.Find ("RunCanvas").gameObject;
+			GameObject runCanvas = CMITImageTarget.transform.Find ("RunCanvas").gameObject;
 						//Object prefab = new Object ();
 						//prefab = AssetDatabase.LoadAssetAtPath ("Assets/Prefabs/MessageBox.prefab", typeof(GameObject));
 						//runCanvas = Instantiate (Resources.Load ("RunCanvas")) as GameObject;
