@@ -163,12 +163,12 @@ public class MenuNavigationScript : MonoBehaviour
 
 				FirmInfo info;
 				info = new FirmInfo ();
-				if (text == "Действуй") {
+				if (text == "Действуй" || text == "действуй" || text == "дейст") {
 						info.GenerateTemplateCMIT ();
 						fillSearchResultItem (info);
 						return;		
 				}
-				if (text == "Юдина") {
+				if (text == "Юдина" || text == "юдина" || text == "юди") {
 						info.GenerateTemplateUdina ();
 						fillSearchResultItem (info);	
 						return;

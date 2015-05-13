@@ -6,33 +6,42 @@ public class PresentationManager : MonoBehaviour
 {
 		public GameObject CMITImageTarget;
 		public GameObject MILAImageTarget;
-	List<GameObject> CMITslides;
-	List<GameObject> MILAslides;
+	    List<GameObject> CMITslides;
+	    List<GameObject> MILAslides;
 		GameObject currentSlide = null;
-		int iterator;
+		string currentPresentation = "";
+		int CMITIterator;
+		int MILAIterator;
 		List<string> runnigpresentations;
-		bool isRunning = false;
+		bool isCMITRunnig = false;
+		bool isMILARunnig = false;
 		// Use this for initialization
 		void Start ()
 		{
-				//slides = new List<GameObject> (GameObject.FindGameObjectsWithTag ("Slides"));
-		CMITslides = new List<GameObject> ();
-		CMITslides.Add (GameObject.Find ("CMITSlide1"));
-		CMITslides.Add (GameObject.Find ("CMITSlide2"));
-		CMITslides.Add (GameObject.Find ("CMITSlide3"));
-		CMITslides.Add (GameObject.Find ("CMITSlide4"));
-		MILAslides.Add (GameObject.Find ("MilaSlide1"));
-		MILAslides.Add (GameObject.Find ("MilaSlide2"));
-		MILAslides.Add (GameObject.Find ("MilaSlide3"));
+				MILAslides = new List<GameObject> ();
+				CMITslides = new List<GameObject> ();
+				CMITslides.Add (GameObject.Find ("CMITSlide1"));
+				CMITslides.Add (GameObject.Find ("CMITSlide2"));
+				CMITslides.Add (GameObject.Find ("CMITSlide3"));
+				CMITslides.Add (GameObject.Find ("CMITSlide4"));
+				//MILAslides.Add (GameObject.Find ("MilaSlide0"));
+				MILAslides.Add (GameObject.Find ("MilaSlide1"));
+				MILAslides.Add (GameObject.Find ("MilaSlide2"));
+				MILAslides.Add (GameObject.Find ("MilaSlide3"));
 				runnigpresentations = new List<string> ();
 				currentSlide = null;
-				iterator = 0;
-		Debug.Log ("SlidesLen: " + CMITslides.Count.ToString ());
-		foreach (GameObject go in CMITslides)
-						go.SetActive (false);
+				CMITIterator = 0;
+				MILAIterator = 0;
+				Debug.Log ("SlidesLen: " + CMITslides.Count.ToString ());
+				foreach (GameObject go in CMITslides) {
+					Debug.Log ("SetActive (false) = " + go.transform.name);			
+					go.SetActive (false);
+				}
 
-		foreach (GameObject go in MILAslides)
-			go.SetActive (false);
+				foreach (GameObject go in MILAslides) {
+					Debug.Log ("SetActive (false) = " + go.transform.name);	
+					go.SetActive (false);
+				}
 		}
 	
 		// Update is called once per frame
@@ -49,36 +58,37 @@ public class PresentationManager : MonoBehaviour
 								go.SetActive (false);
 						}
 				}
-
 		}
+
+	public void setActiveMila(){
+		GameObject mila = MILAImageTarget.transform.Find ("MilaSlide0").gameObject;
+		mila.SetActive(true);
+	}
 
 		public void runPresentation (string name)
 		{
+				currentPresentation = name;
 				Debug.Log ("Starting presentation: " + name);
-				GameObject runCanvas = CMITImageTarget.transform.Find ("RunCanvas").gameObject;
-				runCanvas.SetActive (false);
-				//runCanvas.GetComponent<iTweenAnimation> ().StartAnimation (AnimationType.rotate);
-				showSlide (iterator);
-				isRunning = true;
-				/*runTriggerAnimation (runCanvas.transform.Find ("buRunPresentation").gameObject, "Disappear");
-				runCanvas.SetActive (false);
-				GameObject bulb = ImageTarget.transform.Find ("Slide_1").transform.Find ("Bulb").gameObject;
-				GameObject SlideText1 = ImageTarget.transform.Find ("Slide_1").transform.Find ("TextSlide1").gameObject;
-				SlideText1.SetActive (true);
-				bulb.SetActive (true);
-				bulb.GetComponent<iTweenAnimation> ().StartPunchScale (new Vector3 (1, 1, 1));
-				bulb.GetComponent<iTweenAnimation> ().StartRotate ();
-				SlideText1.GetComponent<iTweenAnimation> ().StartPunchScale (new Vector3 (1, 1, 1));
-				SlideText1.GetComponent<iTweenAnimation> ().StartMoveAdd ();*/
-				//runCanvas.SetActive (false);
+		if (name.Equals("CMIT")) {
+								GameObject runCanvas = CMITImageTarget.transform.Find ("RunCanvas").gameObject;
+								runCanvas.SetActive (false);
+								showSlide (CMITIterator);
+								isCMITRunnig = true;
+						}
+				if ("MILA".Equals (name)) {
+					GameObject runCanvas = MILAImageTarget.transform.Find ("RunCanvas").gameObject;
+					runCanvas.SetActive (false);
+					showSlide (MILAIterator);
+					isMILARunnig = true;
+						}
 		}
 
 		public void OnMarkerFound (string markerName)
 		{
 				Debug.Log ("Marker: " + markerName + " was found");
 				if (markerName == "viz2") {
-						if (!isRunning) {
-				GameObject runCanvas = CMITImageTarget.transform.Find ("RunCanvas").gameObject;
+						if (!isCMITRunnig) {
+								GameObject runCanvas = CMITImageTarget.transform.Find ("RunCanvas").gameObject;
 								//Object prefab = new Object ();
 								//prefab = AssetDatabase.LoadAssetAtPath ("Assets/Prefabs/MessageBox.prefab", typeof(GameObject));
 								//runCanvas = Instantiate (Resources.Load ("RunCanvas")) as GameObject;
@@ -93,6 +103,20 @@ public class PresentationManager : MonoBehaviour
 								currentSlide.SetActive (true);
 
 				}
+				if (markerName == "milaviz") {
+					if (!isMILARunnig) {
+						GameObject runCanvas = MILAImageTarget.transform.Find ("RunCanvas").gameObject;
+						runCanvas.SetActive (true);
+						runTriggerAnimation (runCanvas.transform.Find ("buRunPresentation").gameObject, "Appear");
+
+
+
+						return;
+					}
+					
+					if (currentSlide)
+						currentSlide.SetActive (true);
+				}
 		}
 
 		public void OnMarkerLost (string markerName)
@@ -101,8 +125,7 @@ public class PresentationManager : MonoBehaviour
 				if (markerName == "viz2") {
 						if (currentSlide)
 								currentSlide.SetActive (false);
-
-			GameObject runCanvas = CMITImageTarget.transform.Find ("RunCanvas").gameObject;
+								GameObject runCanvas = CMITImageTarget.transform.Find ("RunCanvas").gameObject;
 						//Object prefab = new Object ();
 						//prefab = AssetDatabase.LoadAssetAtPath ("Assets/Prefabs/MessageBox.prefab", typeof(GameObject));
 						//runCanvas = Instantiate (Resources.Load ("RunCanvas")) as GameObject;
@@ -110,33 +133,76 @@ public class PresentationManager : MonoBehaviour
 						runCanvas.SetActive (false);
 						runTriggerAnimation (runCanvas.transform.Find ("buRunPresentation").gameObject, "Disappear");
 				}
+
+				if (markerName == "milaviz") {
+					if (currentSlide)
+						currentSlide.SetActive (false);
+					GameObject runCanvas = MILAImageTarget.transform.Find ("RunCanvas").gameObject;
+					//Object prefab = new Object ();
+					//prefab = AssetDatabase.LoadAssetAtPath ("Assets/Prefabs/MessageBox.prefab", typeof(GameObject));
+					//runCanvas = Instantiate (Resources.Load ("RunCanvas")) as GameObject;
+					//runCanvas.transform.SetParent (ImageTarget.transform);
+					runCanvas.SetActive (false);
+					runTriggerAnimation (runCanvas.transform.Find ("buRunPresentation").gameObject, "Disappear");
+			GameObject mila = MILAImageTarget.transform.Find ("MilaSlide0").gameObject;
+			mila.SetActive(false);
+				}
 		}
 
 		public void nextSlide ()
 		{
-				if (iterator < slides.Count - 1) {
-						iterator++;
-						showSlide (iterator);
+			if ("CMIT".Equals (currentPresentation)) {
+							if (CMITIterator < CMITslides.Count - 1) {
+									CMITIterator++;
+									showSlide (CMITIterator);
+							}
+							Debug.Log ("iterator = " + CMITIterator);
+			}
+
+			if ("MILA".Equals (currentPresentation)) {
+				if (MILAIterator < MILAslides.Count - 1) {
+					MILAIterator++;
+					showSlide (MILAIterator);
 				}
-				Debug.Log ("iterator = " + iterator);
+				Debug.Log ("iterator = " + CMITIterator);
+			}
+
 		}
 
 		public void prevSlide ()
 		{
-				if (iterator > 0) {
-						iterator--;
-						showSlide (iterator);
+		if ("CMIT".Equals (currentPresentation)) {
+						if (CMITIterator > 0) {
+								CMITIterator--;
+								showSlide (CMITIterator);
+						}
+						Debug.Log ("iterator = " + CMITIterator);
 				}
-				Debug.Log ("iterator = " + iterator);
+		if ("MILA".Equals (currentPresentation)) {
+			if (MILAIterator > 0) {
+				MILAIterator--;
+				showSlide (MILAIterator);
+			}
+			Debug.Log ("iterator = " + MILAIterator);
+		}
+
+
 		}
 
 		void showSlide (int id)
 		{
 				if (currentSlide)
 						currentSlide.SetActive (false);
-				currentSlide = slides [id];
-				currentSlide.SetActive (true);
-				Debug.Log ("current slide id = " + id.ToString ());
+				if ("CMIT".Equals (currentPresentation)) {
+						currentSlide = CMITslides [id];
+						currentSlide.SetActive (true);
+						Debug.Log ("current slide id = " + id.ToString ());
+				}
+				if ("MILA".Equals (currentPresentation)) {
+						currentSlide = MILAslides [id];
+						currentSlide.SetActive (true);
+						Debug.Log ("current slide id = " + id.ToString ());
+				}
 		}
 
 		IEnumerator DoMoving ()
